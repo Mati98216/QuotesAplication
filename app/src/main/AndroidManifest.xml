@@ -9,7 +9,36 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.QuotesApplication"
-        tools:targetApi="31" />
+        android:theme="@style/Theme.QuotesApplicationProject"
+        tools:targetApi="31">
+        <activity
+            android:name=".EditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AllQuoteActivity"
+            android:exported="false" />
+        <activity android:name=".RatingActivity"
+            android:exported="false"/>
+        <activity android:name=".CategoryActivity"
+            android:exported="false"/>
+        <activity android:name=".QuoteWithCaregoryActivity"
+            android:exported="false"/>
+        <activity android:name=".LikedQuoteActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.QuotesApplicationProject.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <meta-data
+            android:name="androidx.room.RoomDatabase"
+            android:value="com.example.quotesapplicationproject.data.AppDatabase" />
+    </application>
 
 </manifest>
