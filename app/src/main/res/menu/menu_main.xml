@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.quotesapplicationproject.MainActivity">
+    <group android:id="@+id/menu_group">
+    <item
+        android:id="@+id/menu_category"
+        android:icon="@drawable/baseline_library_books_24"
+        android:title="Category" />
+    <item
+        android:id="@+id/menu_liked_quote"
+        android:icon="@drawable/baseline_thumb_up_24"
+        android:title="Liked Quotes" />
+    <item
+        android:id="@+id/menu_rating"
+        android:title="New Rating" />
+    </group>
+</menu>
