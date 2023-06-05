@@ -1,22 +1,22 @@
 package com.example.quotesapplicationproject
 
 import android.annotation.SuppressLint
-    import android.content.DialogInterface
-    import android.content.Intent
-    import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.app.Dialog
+import android.content.*
+import android.os.Bundle
+import android.view.*
 import android.widget.TextView
-    import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
     import com.example.quotesapplicationproject.adapter.QuoteAdapter
     import com.example.quotesapplicationproject.data.AppDatabase
-    import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
+import com.example.quotesapplicationproject.data.entity.Quotes
+import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
 
     import kotlinx.coroutines.*
 class QuoteWithCategoryFragment : Fragment() {
@@ -69,7 +69,10 @@ class QuoteWithCategoryFragment : Fragment() {
                             getData()
                         } else if (which == 2) {
                             // FullScreen
-                            showFullScreenDialog(position)
+                            val quoteWithRatingAndCategory = list[position]
+                            val quote = quoteWithRatingAndCategory.quotes
+                            showFullScreenDialog(quote)
+
                         } else {
                             // Cancel
                             dialog.dismiss()
@@ -90,6 +93,34 @@ class QuoteWithCategoryFragment : Fragment() {
         super.onResume()
         getData()
     }
+    private fun showFullScreenDialog(quote: Quotes) {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_full_screen)
+
+        val authorTextView = dialog.findViewById<TextView>(R.id.authorTextView)
+        val quoteTextView = dialog.findViewById<TextView>(R.id.quoteTextView)
+
+        authorTextView.text = quote.author
+        quoteTextView.text = quote.quote
+        quoteTextView.setOnClickListener {
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("quote", quote.quote)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), "Tekst został skopiowany do schowka", Toast.LENGTH_SHORT).show()
+        }
+        dialog.show()
+
+        // Adjust dialog width and height to match the screen
+        dialog.window?.apply {
+            attributes = attributes.apply {
+                width = WindowManager.LayoutParams.MATCH_PARENT
+                height = WindowManager.LayoutParams.MATCH_PARENT
+            }
+        }
+    }
 
     private fun getData() {
         list.clear()
@@ -103,24 +134,5 @@ class QuoteWithCategoryFragment : Fragment() {
         }
     }
 
-    @SuppressLint("InflateParams")
-    private fun showFullScreenDialog(position: Int) {
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        val dialogView = layoutInflater.inflate(R.layout.dialog_full_screen, null)
-        val quoteTextView = dialogView.findViewById<TextView>(R.id.quoteTextView)
-        val authorTextView = dialogView.findViewById<TextView>(R.id.authorTextView)
 
-        quoteTextView.text = list[position].quotes.quote
-        authorTextView.text = list[position].quotes.author
-
-        dialogBuilder.setView(dialogView)
-        dialogBuilder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-
-        val dialog = dialogBuilder.create()
-        dialog.show()
-
-        // Adjust dialog width to match the screen
-        val window = dialog.window
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
-    }
 }
