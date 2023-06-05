@@ -1,68 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditActivity"
-    android:orientation="vertical">
-
-    <com.google.android.material.textfield.TextInputLayout
+    tools:context=".EditFragment"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center">
 
-        <EditText
-            android:id="@+id/quote"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textLongMessage"
-            android:hint="Quote"
-            />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:id="@+id/quotelayout">
+
+            <EditText
+                android:id="@+id/quote"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Quote"
+                android:inputType="textLongMessage" />
+        </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
+
+        android:id="@+id/authorlayout"
+        android:layout_alignBottom="@+id/quotelayout"
+        android:layout_marginBottom="-60dp"
         >
+
         <EditText
             android:id="@+id/author"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
+            android:layout_height="match_parent"
             android:hint="Author"
-            />
+            android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Spinner
-        android:id="@+id/categorySpinner"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_marginBottom="14dp" />
+        <Spinner
+            android:id="@+id/categorySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_alignBottom="@id/authorlayout"
+            android:layout_marginBottom="-55dp" />
 
-    <Spinner
-        android:id="@+id/ratingSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="47dp"
-        android:layout_marginBottom="14dp" />
-    <Button
-        android:id="@+id/btn_like"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        <Spinner
+            android:id="@+id/ratingSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_alignBottom="@id/categorySpinner"
+            android:layout_marginBottom="-55dp" />
 
-        android:text="Like"/>
-    <Button
-    android:id="@+id/btn_save"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+        <Button
+            android:id="@+id/btn_like"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/ratingSpinner"
+            android:layout_marginBottom="-55dp"
+            android:text="Like" />
 
-    android:text="Save"/>
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btn_like"
+            android:layout_marginBottom="-55dp"
+            android:text="Save" />
 
-    <Button
-        android:id="@+id/btn_back"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="Back" />
-</LinearLayout>
+
+
+
+
+
+    </RelativeLayout>
+</FrameLayout>

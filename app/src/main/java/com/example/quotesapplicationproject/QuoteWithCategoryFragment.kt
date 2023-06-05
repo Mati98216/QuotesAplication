@@ -4,12 +4,14 @@ import android.annotation.SuppressLint
     import android.content.DialogInterface
     import android.content.Intent
     import android.os.Bundle
-    import android.view.WindowManager
-    import android.widget.Button
-    import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.TextView
     import androidx.appcompat.app.AlertDialog
-    import androidx.appcompat.app.AppCompatActivity
-    import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
     import androidx.recyclerview.widget.LinearLayoutManager
     import androidx.recyclerview.widget.RecyclerView
     import com.example.quotesapplicationproject.adapter.QuoteAdapter
@@ -17,38 +19,50 @@ import android.annotation.SuppressLint
     import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
 
     import kotlinx.coroutines.*
-class QuoteWithCaregoryActivity : AppCompatActivity() {
+class QuoteWithCategoryFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var btnBack: Button
+
     private var list = mutableListOf<QuotesWithRatingAndCategory>()
     private lateinit var adapter: QuoteAdapter
     private lateinit var database: AppDatabase
     private var categoryId: Int = -1
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_quotewithcategoryactivity)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.activity_quotewithcategoryactivity, container, false)
+    }
 
-        recyclerView = findViewById(R.id.recycler_view)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        btnBack = findViewById(R.id.btn_back)
+        recyclerView = view.findViewById(R.id.recycler_view)
 
-        categoryId = intent.getIntExtra("category_id", -1)
-        database = AppDatabase.getInstance(applicationContext)
+        categoryId = arguments?.getInt("category_id", -1) ?: -1
+        database = AppDatabase.getInstance(requireContext())
         adapter = QuoteAdapter(list)
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
                 // Creating dialog view
-                val dialog = AlertDialog.Builder(this@QuoteWithCaregoryActivity)
+                val dialog = AlertDialog.Builder(requireContext())
                 dialog.setTitle(list[position].quotes.quote)
                 dialog.setItems(R.array.items_option,
                     DialogInterface.OnClickListener { dialog, which ->
                         if (which == 0) {
                             // Edit
-                            val intent = Intent(this@QuoteWithCaregoryActivity, EditActivity::class.java)
-                            intent.putExtra("id", list[position].quotes.id)
-                            startActivity(intent)
+                            val fragment = EditFragment()
+                            val bundle = Bundle()
+                            bundle.putInt("id", list[position].quotes.id ?:0)
+                            fragment.arguments = bundle
+
+                            val fragmentManager = requireActivity().supportFragmentManager
+                            fragmentManager.beginTransaction()
+                                .replace(R.id.fl_wrapper, fragment)
+                                .addToBackStack(null)
+                                .commit()
                         } else if (which == 1) {
                             // Delete
                             database.quotesDAO().delete(list[position].quotes)
@@ -68,35 +82,8 @@ class QuoteWithCaregoryActivity : AppCompatActivity() {
         })
 
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(applicationContext, RecyclerView.VERTICAL))
-
-
-
-        btnBack.setOnClickListener {
-            onBackPressed()
-        }
-    }
-
-    @SuppressLint("InflateParams")
-    private fun showFullScreenDialog(position: Int) {
-        val dialogBuilder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.dialog_full_screen, null)
-        val quoteTextView = dialogView.findViewById<TextView>(R.id.quoteTextView)
-        val authorTextView = dialogView.findViewById<TextView>(R.id.authorTextView)
-
-        quoteTextView.text = list[position].quotes.quote
-        authorTextView.text = list[position].quotes.author
-
-        dialogBuilder.setView(dialogView)
-        dialogBuilder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-
-        val dialog = dialogBuilder.create()
-        dialog.show()
-
-        // Adjust dialog width to match the screen
-        val window = dialog.window
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
     }
 
     override fun onResume() {
@@ -114,5 +101,26 @@ class QuoteWithCaregoryActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         }
+    }
+
+    @SuppressLint("InflateParams")
+    private fun showFullScreenDialog(position: Int) {
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.dialog_full_screen, null)
+        val quoteTextView = dialogView.findViewById<TextView>(R.id.quoteTextView)
+        val authorTextView = dialogView.findViewById<TextView>(R.id.authorTextView)
+
+        quoteTextView.text = list[position].quotes.quote
+        authorTextView.text = list[position].quotes.author
+
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
+
+        // Adjust dialog width to match the screen
+        val window = dialog.window
+        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
     }
 }

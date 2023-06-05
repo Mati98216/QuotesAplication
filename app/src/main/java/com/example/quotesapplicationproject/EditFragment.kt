@@ -3,21 +3,23 @@ package com.example.quotesapplicationproject
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.quotesapplicationproject.data.AppDatabase
 import com.example.quotesapplicationproject.data.entity.Category
 import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.Rating
 import kotlinx.coroutines.*
 
-class EditActivity : AppCompatActivity() {
+class EditFragment : Fragment() {
     private lateinit var quotes: EditText
     private lateinit var author: EditText
     private lateinit var btnSave: Button
@@ -28,41 +30,37 @@ class EditActivity : AppCompatActivity() {
     private var categoryId: Int = 0
     private var ratingId: Int = 0
     private lateinit var database: AppDatabase
-    private lateinit var categoryList: List<Category>
-    private lateinit var ratingList: List<Rating>
-    private lateinit var btnBack: Button
+    private  var categoryList: List<Category> = emptyList()
+    private  var ratingList: List<Rating> = emptyList()
+
     private val coroutineScope: CoroutineScope by lazy {
         CoroutineScope(SupervisorJob() + Dispatchers.Main)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit)
-        btnBack = findViewById(R.id.btn_back)
-        quotes = findViewById(R.id.quote)
-        author = findViewById(R.id.author)
-        btnSave = findViewById(R.id.btn_save)
-        btnLike = findViewById(R.id.btn_like)
-        categorySpinner = findViewById(R.id.categorySpinner)
-        ratingSpinner = findViewById(R.id.ratingSpinner)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.activity_edit, container, false)
 
-        database = AppDatabase.getInstance(applicationContext)
+        quotes = view.findViewById(R.id.quote)
+        author = view.findViewById(R.id.author)
+        btnSave = view.findViewById(R.id.btn_save)
+        btnLike = view.findViewById(R.id.btn_like)
+        categorySpinner = view.findViewById(R.id.categorySpinner)
+        ratingSpinner = view.findViewById(R.id.ratingSpinner)
+
+        database = AppDatabase.getInstance(requireContext())
 
         fetchCategories()
         fetchRatings()
 
-        val intent = intent.extras
-        if (intent != null) {
-            val id = intent.getInt("id", 0)
-            val quote = database.quotesDAO().get(id)
-
+        val quoteId = arguments?.getInt("id", 0) ?: 0
+        val quote = database.quotesDAO().get(quoteId)
+        quote?.let { quote ->
             quotes.setText(quote.quote)
             author.setText(quote.author)
             likedQuote = quote.likedQuote
             categoryId = quote.categoryId ?: 0
             ratingId = quote.ratingId ?: 0
 
-            // Set selected category and rating on spinners
             val selectedCategoryPosition = categoryList.indexOfFirst { it.id == categoryId }
             categorySpinner.setSelection(selectedCategoryPosition)
 
@@ -92,70 +90,47 @@ class EditActivity : AppCompatActivity() {
 
         btnSave.setOnClickListener {
             if (quotes.text.isNotEmpty() && author.text.isNotEmpty()) {
-                val quote = quotes.text.toString()
+                val quoteText = quotes.text.toString()
                 val authorName = author.text.toString()
 
-                if (isQuoteAndAuthorExist(quote, authorName)) {
-                    Toast.makeText(applicationContext, "Cytat i autor już istnieją", Toast.LENGTH_SHORT).show()
+                val quote = database.quotesDAO().get(quoteId)
+                if (quote != null) {
+                    // Editing an existing quote
+                    if (isQuoteExists(quoteText, authorName, categoryId, ratingId)) {
+                        Toast.makeText(requireContext(), "Cytat już istnieje", Toast.LENGTH_SHORT).show()
+                    } else {
+                        updateQuote(quote, quoteText, authorName)
+                    }
                 } else {
-                    coroutineScope.launch {
-                        // Perform database operations on the IO thread
-                        withContext(Dispatchers.IO) {
-                            if (intent != null) {
-                                // Edit data
-                                val updatedQuote = Quotes(
-                                    intent.getInt("id", 0),
-                                    quote,
-                                    authorName,
-                                    likedQuote,
-                                    ratingId,
-                                    categoryId
-                                )
-                                database.quotesDAO().update(updatedQuote)
-                            } else {
-                                // Insert new data
-                                val newQuote = Quotes(
-                                    null,
-                                    quote,
-                                    authorName,
-                                    likedQuote,
-                                    ratingId,
-                                    categoryId
-                                )
-                                newQuote.ratingId = ratingId
-                                newQuote.categoryId = categoryId
-                                database.quotesDAO().insertAll(newQuote)
-                            }
-                        }
-                        startActivity(Intent(this@EditActivity, MainActivity::class.java))
-                        finish()
+                    // Adding a new quote
+                    if (isQuoteAndAuthorExist(quoteText, authorName)) {
+                        Toast.makeText(requireContext(), "Cytat i autor już istnieją", Toast.LENGTH_SHORT).show()
+                    } else {
+                        addNewQuote(quoteText, authorName)
                     }
                 }
             } else {
-                Toast.makeText(applicationContext, "Wprowadź dane w polach tekstowych", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Wprowadź dane w polach tekstowych", Toast.LENGTH_SHORT).show()
             }
         }
-
         btnLike.setOnClickListener {
             likedQuote = !likedQuote
             if (likedQuote) {
-                Toast.makeText(applicationContext, "Polubione", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Polubione", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(applicationContext, "Niepolubione", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Niepolubione", Toast.LENGTH_SHORT).show()
             }
         }
-        btnBack.setOnClickListener {
-            onBackPressed()
-        }
-    }
 
+        return view
+    }
     private fun fetchCategories() {
-        database.categoryDAO().getAll().observe(this, { categories ->
+        database.categoryDAO().getAll().observe(viewLifecycleOwner, { categories ->
             categories?.let {
-                Log.d("EditActivity", "Fetched category data: $categories")
+                Log.d("EditFragment", "Fetched category data: $categories")
                 categoryList = it
                 val categoryNames = categoryList.map { category -> category.category }
-                val categoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
+                val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNames)
                 categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 categorySpinner.adapter = categoryAdapter
 
@@ -167,12 +142,12 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun fetchRatings() {
-        database.ratingDAO().getAll().observe(this, { ratings ->
+        database.ratingDAO().getAll().observe(viewLifecycleOwner, { ratings ->
             ratings?.let {
-                Log.d("EditActivity", "Fetched rating data: $ratings")
+                Log.d("EditFragment", "Fetched rating data: $ratings")
                 ratingList = it
                 val ratingValues = ratingList.map { rating -> rating.rating.toString() }
-                val ratingAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, ratingValues)
+                val ratingAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, ratingValues)
                 ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 ratingSpinner.adapter = ratingAdapter
 
@@ -183,8 +158,50 @@ class EditActivity : AppCompatActivity() {
         })
     }
 
+    private fun addNewQuote(quoteText: String, authorName: String) {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                val newQuote = Quotes(
+                    null,
+                    quoteText,
+                    authorName,
+                    likedQuote,
+                    ratingId,
+                    categoryId
+                )
+                newQuote.ratingId = ratingId
+                newQuote.categoryId = categoryId
+                database.quotesDAO().insertAll(newQuote)
+            }
+            requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+            requireActivity().finish()
+        }
+    }
+
+    private fun updateQuote(quote: Quotes, quoteText: String, authorName: String) {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                quote.quote = quoteText
+                quote.author = authorName
+                quote.likedQuote = likedQuote
+                quote.ratingId = ratingId
+                quote.categoryId = categoryId
+                database.quotesDAO().update(quote)
+            }
+            requireActivity().startActivity(Intent(requireContext(), MainActivity::class.java))
+            requireActivity().finish()
+        }
+    }
+
     private fun isQuoteAndAuthorExist(quote: String, author: String): Boolean {
         val existingQuote = database.quotesDAO().getQuoteByQuoteAndAuthor(quote, author)
         return existingQuote != null
     }
+
+    private fun isQuoteExists(quote: String, author: String, categoryId: Int, ratingId: Int): Boolean {
+        val existingQuote = database.quotesDAO().getQuoteByDetails(quote, author, categoryId, ratingId)
+        return existingQuote != null
+    }
 }
+
+

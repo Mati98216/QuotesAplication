@@ -6,6 +6,8 @@ import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCateg
 
 @Dao
 interface QuotesDAO {
+    @Query("SELECT * FROM quotes WHERE quote = :quote AND author = :author AND categoryId = :categoryId AND ratingId = :ratingId LIMIT 1")
+    fun getQuoteByDetails(quote: String, author: String, categoryId: Int, ratingId: Int): Quotes?
     @Query("SELECT * FROM quotes WHERE Quote = :quote AND Author = :author")
     fun getQuoteByQuoteAndAuthor(quote: String, author: String): Quotes?
     @Query("SELECT quotes.*, rating.Value, category.Category FROM quotes INNER JOIN rating ON quotes.ratingId = rating.id INNER JOIN category ON quotes.categoryId = category.id")

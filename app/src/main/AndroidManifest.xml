@@ -12,18 +12,18 @@
         android:theme="@style/Theme.QuotesApplicationProject"
         tools:targetApi="31">
         <activity
-            android:name=".EditActivity"
+            android:name=".EditFragment"
             android:exported="false" />
         <activity
-            android:name=".AllQuoteActivity"
+            android:name=".AllQuoteFragment"
             android:exported="false" />
         <activity android:name=".RatingActivity"
             android:exported="false"/>
-        <activity android:name=".CategoryActivity"
+        <activity android:name=".CategoryFragment"
             android:exported="false"/>
-        <activity android:name=".QuoteWithCaregoryActivity"
+        <activity android:name=".QuoteWithCategoryFragment"
             android:exported="false"/>
-        <activity android:name=".LikedQuoteActivity"
+        <activity android:name=".LikedQuoteFragment"
             android:exported="false"/>
         <activity
             android:name=".MainActivity"
