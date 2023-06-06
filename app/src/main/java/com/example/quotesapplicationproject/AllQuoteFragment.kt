@@ -1,15 +1,11 @@
 package com.example.quotesapplicationproject
 
-import android.annotation.SuppressLint
-import android.content.DialogInterface
-import android.content.Intent
+import android.app.Dialog
+import android.content.*
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.Button
+import android.view.*
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quotesapplicationproject.adapter.QuoteAdapter
 import com.example.quotesapplicationproject.data.AppDatabase
+import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.*
@@ -59,7 +56,9 @@ class AllQuoteFragment : Fragment() {
                         }
                         2 -> {
                             // FullScreen
-                            showFullScreenDialog(position)
+                            val quoteWithRatingAndCategory = list[position]
+                            val quote = quoteWithRatingAndCategory.quotes
+                            showFullScreenDialog(quote)
                         }
                         else -> dialogInterface.dismiss()
                     }
@@ -81,27 +80,47 @@ class AllQuoteFragment : Fragment() {
         return view
     }
 
-    @SuppressLint("InflateParams")
-    private fun showFullScreenDialog(position: Int) {
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        val dialogView = layoutInflater.inflate(R.layout.dialog_full_screen, null)
-        val quoteTextView = dialogView.findViewById<TextView>(R.id.quoteTextView)
-        val authorTextView = dialogView.findViewById<TextView>(R.id.authorTextView)
+    private fun showFullScreenDialog(quote: Quotes) {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_full_screen)
 
-        quoteTextView.text = list[position].quotes.quote
-        authorTextView.text = list[position].quotes.author
+        val authorTextView = dialog.findViewById<TextView>(R.id.authorTextView)
+        val quoteTextView = dialog.findViewById<TextView>(R.id.quoteTextView)
 
-        dialogBuilder.setView(dialogView)
-        dialogBuilder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+        authorTextView.text = quote.author
+        quoteTextView.text = quote.quote
 
-        val dialog = dialogBuilder.create()
+        quoteTextView.setOnClickListener {
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("quote", quote.quote)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), "Tekst został skopiowany do schowka", Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.window?.decorView?.setOnTouchListener { _, event ->
+            val x = event.x.toInt()
+            val y = event.y.toInt()
+
+            if (x < quoteTextView.left || x > quoteTextView.right || y < quoteTextView.top || y > quoteTextView.bottom) {
+                dialog.dismiss()
+            }
+
+            true
+        }
+
         dialog.show()
 
-        // Adjust dialog width to match the screen
-        val window = dialog.window
-        window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        // Adjust dialog width and height to match the screen
+        dialog.window?.apply {
+            attributes = attributes.apply {
+                width = WindowManager.LayoutParams.MATCH_PARENT
+                height = WindowManager.LayoutParams.MATCH_PARENT
+            }
+        }
     }
-
     override fun onResume() {
         super.onResume()
         getData()

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.*
 import android.os.Bundle
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -17,12 +18,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
     import com.example.quotesapplicationproject.data.AppDatabase
 import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-    import kotlinx.coroutines.*
+import kotlinx.coroutines.*
 class QuoteWithCategoryFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-
+    private lateinit var fab: FloatingActionButton
     private var list = mutableListOf<QuotesWithRatingAndCategory>()
     private lateinit var adapter: QuoteAdapter
     private lateinit var database: AppDatabase
@@ -40,7 +42,7 @@ class QuoteWithCategoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerView = view.findViewById(R.id.recycler_view)
-
+        fab = view.findViewById(R.id.fab)
         categoryId = arguments?.getInt("category_id", -1) ?: -1
         database = AppDatabase.getInstance(requireContext())
         adapter = QuoteAdapter(list)
@@ -86,7 +88,13 @@ class QuoteWithCategoryFragment : Fragment() {
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
+        recyclerView.addItemDecoration(DividerItemDecoration(requireContext() , RecyclerView.VERTICAL))
+        fab.setOnClickListener {
+            val editFragment = EditFragment()
+            openFragment(editFragment)
+        }
+
+
     }
 
     override fun onResume() {
@@ -105,12 +113,25 @@ class QuoteWithCategoryFragment : Fragment() {
 
         authorTextView.text = quote.author
         quoteTextView.text = quote.quote
+
         quoteTextView.setOnClickListener {
             val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("quote", quote.quote)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(requireContext(), "Tekst został skopiowany do schowka", Toast.LENGTH_SHORT).show()
         }
+
+        dialog.window?.decorView?.setOnTouchListener { _, event ->
+            val x = event.x.toInt()
+            val y = event.y.toInt()
+
+            if (x < quoteTextView.left || x > quoteTextView.right || y < quoteTextView.top || y > quoteTextView.bottom) {
+                dialog.dismiss()
+            }
+
+            true
+        }
+
         dialog.show()
 
         // Adjust dialog width and height to match the screen
@@ -121,6 +142,8 @@ class QuoteWithCategoryFragment : Fragment() {
             }
         }
     }
+
+
 
     private fun getData() {
         list.clear()
@@ -133,6 +156,11 @@ class QuoteWithCategoryFragment : Fragment() {
             }
         }
     }
-
+    private fun openFragment(fragment: Fragment) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fl_wrapper, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
 
 }

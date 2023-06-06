@@ -41,7 +41,23 @@ class LikedQuoteFragment : Fragment() {
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
                 if (position >= 0 && position < list.size) {
+                    val clickedQuote = list[position].quotes
+                    val isLiked = clickedQuote.likedQuote
 
+                    // Zmiana stanu likedQuote
+                    clickedQuote.likedQuote = !isLiked
+
+                    // Aktualizacja widoku RecyclerView
+                    adapter.notifyItemChanged(position)
+
+                    // Zapisanie zmienionego stanu w bazie danych
+                    CoroutineScope(Dispatchers.IO).launch {
+                        database.quotesDAO().update(clickedQuote)
+                        withContext(Dispatchers.Main) {
+                            // Odświeżenie widoku fragmentu
+                            getData()
+                        }
+                    }
                 } else {
                     Log.e("LikedQuoteFragment", "Invalid quote position: $position")
                 }
@@ -51,12 +67,15 @@ class LikedQuoteFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume() {
+        super.onResume()
         getData()
     }
 
+
+
     private fun getData() {
+        list.clear()
         CoroutineScope(Dispatchers.IO).launch {
             val likedQuotes = database.quotesDAO().getAllForLikedQuotes()
             withContext(Dispatchers.Main) {

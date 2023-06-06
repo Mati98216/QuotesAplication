@@ -96,7 +96,7 @@ class EditFragment : Fragment() {
                 val quote = database.quotesDAO().get(quoteId)
                 if (quote != null) {
                     // Editing an existing quote
-                    if (isQuoteExists(quoteText, authorName, categoryId, ratingId)) {
+                    if (isQuoteExists(quoteText, authorName, categoryId, ratingId,likedQuote)) {
                         Toast.makeText(requireContext(), "Cytat już istnieje", Toast.LENGTH_SHORT).show()
                     } else {
                         updateQuote(quote, quoteText, authorName)
@@ -198,8 +198,8 @@ class EditFragment : Fragment() {
         return existingQuote != null
     }
 
-    private fun isQuoteExists(quote: String, author: String, categoryId: Int, ratingId: Int): Boolean {
-        val existingQuote = database.quotesDAO().getQuoteByDetails(quote, author, categoryId, ratingId)
+    private fun isQuoteExists(quote: String, author: String, categoryId: Int, ratingId: Int,isLikedQuote:Boolean): Boolean {
+        val existingQuote = database.quotesDAO().getQuoteByDetails(quote, author, categoryId, ratingId,isLikedQuote)
         return existingQuote != null
     }
 }

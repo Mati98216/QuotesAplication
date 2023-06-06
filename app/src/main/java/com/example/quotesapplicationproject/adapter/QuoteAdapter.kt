@@ -49,10 +49,10 @@ class QuoteAdapter(var list: List<QuotesWithRatingAndCategory>) : RecyclerView.A
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val quote = list[position].quotes
-        holder.quotes.text = quote.quote
-        holder.author.text = quote.author
-        holder.category.text = list[position].category
-        holder.ratingValue.text = list[position].ratingValue?.toString() ?: ""
+        holder.quotes.text = "Quote: ${quote.quote}"
+        holder.author.text = "Author: ${quote.author}"
+        holder.category.text = "Category: ${list[position].category}"
+        holder.ratingValue.text = "Rating: ${list[position].ratingValue?.toString() ?: ""}"
     }
 
 }
