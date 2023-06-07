@@ -58,18 +58,38 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_alignBottom="@id/authorlayout"
-            android:layout_marginBottom="-55dp"
+            android:layout_marginBottom="-65dp"
             android:background="@color/controls"
-            android:popupBackground="@color/controls"/>
+            android:popupBackground="@color/controls" />
+
+        <TextView
+            android:id="@+id/categoryDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/categorySpinner"
+            android:layout_below="@id/categorySpinner"
+            android:layout_marginTop="-3dp"
+            android:text="Category"
+            android:textSize="14sp" />
 
         <Spinner
             android:id="@+id/ratingSpinner"
             android:layout_width="match_parent"
             android:layout_height="47dp"
             android:layout_alignBottom="@id/categorySpinner"
-            android:layout_marginBottom="-55dp"
+            android:layout_marginBottom="-65dp"
             android:background="@color/controls"
-            android:popupBackground="@color/controls"/>
+            android:popupBackground="@color/controls" />
+
+        <TextView
+            android:id="@+id/ratingDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/ratingSpinner"
+            android:layout_below="@id/ratingSpinner"
+            android:layout_marginTop="-3dp"
+            android:text="Rating"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btn_like"
