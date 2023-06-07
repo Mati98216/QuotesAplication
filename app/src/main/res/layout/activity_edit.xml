@@ -28,8 +28,8 @@
                 android:id="@+id/quote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/quote_custom_icon"
                 android:inputType="textLongMessage" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -46,9 +46,10 @@
 
             <EditText
                 android:id="@+id/author"
+                android:drawablePadding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
+                android:drawableStart="@drawable/author_custom_icon"
                 android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 

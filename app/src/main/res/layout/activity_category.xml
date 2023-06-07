@@ -19,6 +19,7 @@
         android:layout_marginBottom="14dp"
         android:background="@color/controls"
         android:id="@+id/categorylayout"
+        android:hint="Category"
         >
 
         <EditText
@@ -26,8 +27,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textLongMessage"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/category_custom_icon"
 
-            android:hint="Category"
             />
     </com.google.android.material.textfield.TextInputLayout>
 

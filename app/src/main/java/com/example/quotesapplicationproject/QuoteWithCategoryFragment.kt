@@ -81,8 +81,9 @@ class QuoteWithCategoryFragment : Fragment() {
                         }
                     })
                 // Display dialog
-                val dialogView = dialog.create()
-                dialogView.show()
+                val dialogInstance = dialog.show()
+                val dialogWindow = dialogInstance.window
+                dialogWindow?.setBackgroundDrawableResource(R.color.controls)
             }
         })
 

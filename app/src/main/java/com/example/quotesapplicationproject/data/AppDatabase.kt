@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Quotes::class, Category::class, Rating::class], version = 16544200)
+@Database(entities = [Quotes::class, Category::class, Rating::class], version = 144)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun quotesDAO(): QuotesDAO
     abstract fun categoryDAO(): CategoryDAO
@@ -67,9 +67,10 @@ abstract class AppDatabase : RoomDatabase() {
 
                 // Prepopulate the Category table
                 val categories = listOf(
-                    Category(category = "Category 1"),
-                    Category(category = "Category 2"),
-                    Category(category = "Category 3")
+                    Category(category = "Życie"),
+                    Category(category = "Sport"),
+                    Category(category = "Rozrywka"),
+                    Category(category = "Muzyka")
                 )
                 categoryDAO.insertAll(categories)
             }

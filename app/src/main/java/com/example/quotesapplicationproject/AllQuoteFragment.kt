@@ -64,7 +64,10 @@ class AllQuoteFragment : Fragment() {
                     }
                 }
                 // Display dialog
-                dialog.show()
+                val dialogInstance = dialog.show()
+                val dialogWindow = dialogInstance.window
+                dialogWindow?.setBackgroundDrawableResource(R.color.controls)
+               /* dialog.show()*/
             }
         })
 

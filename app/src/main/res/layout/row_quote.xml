@@ -3,16 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="14dp"
     android:background="@color/controls">
 <TextView
+    android:textColor="@color/black"
     android:id="@+id/quote"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textStyle="italic"
+    android:textStyle="bold"
     android:textAlignment="center"
+    android:fontFamily="@font/stoic_regular"
     android:padding="8dp"
-    android:textSize="28sp"
+    android:textSize="30dp"
     android:layout_gravity="center_vertical|center_horizontal"
     android:text="Quote"/>
 
@@ -20,31 +21,39 @@
         android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="italic"
+        android:textStyle="bold"
+
         android:textAlignment="center"
-        android:textSize="22sp"
+        android:textSize="26sp"
         android:text="Author"
-        android:padding="8dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/stoic_regular"
+
+        android:padding="5dp"
         android:layout_gravity="center_vertical|center_horizontal"/>
     <TextView
+        android:textColor="@color/black"
         android:id="@+id/category_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="italic"
+        android:textStyle="bold"
+        android:fontFamily="@font/stoic_regular"
         android:textAlignment="center"
-        android:textSize="16sp"
+        android:textSize="22sp"
         android:text="Category"
-        android:padding="8dp"
+        android:padding="5dp"
         android:layout_gravity="center_vertical|center_horizontal"/>
     <TextView
+        android:textColor="@color/black"
         android:id="@+id/rating_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="italic"
+        android:textStyle="bold"
+        android:fontFamily="@font/stoic_regular"
         android:textAlignment="center"
-        android:textSize="12sp"
+        android:textSize="18sp"
         android:text="Rating"
-        android:padding="8dp"
+        android:padding="5dp"
         android:layout_gravity="center_vertical|center_horizontal"/>
     <TextView
         android:id="@+id/likedQuote"
