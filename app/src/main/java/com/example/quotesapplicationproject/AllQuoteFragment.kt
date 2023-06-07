@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quotesapplicationproject.adapter.QuoteAdapter
 import com.example.quotesapplicationproject.data.AppDatabase
+import com.example.quotesapplicationproject.data.dao.QuotesDAO
 import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,6 +26,7 @@ class AllQuoteFragment : Fragment() {
     private var list = mutableListOf<QuotesWithRatingAndCategory>()
     private lateinit var adapter: QuoteAdapter
     private lateinit var database: AppDatabase
+    private lateinit var quotesDAO: QuotesDAO
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_allquotemain, container, false)
@@ -33,7 +35,8 @@ class AllQuoteFragment : Fragment() {
         fab = view.findViewById(R.id.fab)
 
         database = AppDatabase.getInstance(requireContext())
-        adapter = QuoteAdapter(list)
+        quotesDAO = database.quotesDAO()
+        adapter = QuoteAdapter(list,quotesDAO)
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
                 // Creating dialog view

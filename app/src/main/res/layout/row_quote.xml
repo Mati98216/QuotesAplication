@@ -55,10 +55,10 @@
         android:text="Rating"
         android:padding="5dp"
         android:layout_gravity="center_vertical|center_horizontal"/>
-    <TextView
+    <ImageButton
         android:id="@+id/likedQuote"
         android:layout_gravity="end"
-        android:src="@drawable/baseline_add_reaction_24"
+        android:background="@color/controls"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"/>
 

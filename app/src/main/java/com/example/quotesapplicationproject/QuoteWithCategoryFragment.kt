@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
     import androidx.recyclerview.widget.RecyclerView
     import com.example.quotesapplicationproject.adapter.QuoteAdapter
     import com.example.quotesapplicationproject.data.AppDatabase
+import com.example.quotesapplicationproject.data.dao.QuotesDAO
 import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCategory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -29,7 +30,7 @@ class QuoteWithCategoryFragment : Fragment() {
     private lateinit var adapter: QuoteAdapter
     private lateinit var database: AppDatabase
     private var categoryId: Int = -1
-
+    private lateinit var quotesDAO: QuotesDAO
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,7 +46,8 @@ class QuoteWithCategoryFragment : Fragment() {
         fab = view.findViewById(R.id.fab)
         categoryId = arguments?.getInt("category_id", -1) ?: -1
         database = AppDatabase.getInstance(requireContext())
-        adapter = QuoteAdapter(list)
+        quotesDAO = database.quotesDAO()
+        adapter = QuoteAdapter(list,quotesDAO)
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
                 // Creating dialog view
