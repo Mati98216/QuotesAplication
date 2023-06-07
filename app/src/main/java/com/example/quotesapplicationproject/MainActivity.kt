@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.fab)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
+
+
         recyclerViewHandler = MainActivityRecyclerViewHandler(
             this,
             recyclerView,
