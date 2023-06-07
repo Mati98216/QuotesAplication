@@ -20,6 +20,8 @@
         android:background="@color/controls"
         android:id="@+id/categorylayout"
         android:hint="Category"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         >
 
         <EditText
