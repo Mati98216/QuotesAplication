@@ -17,8 +17,6 @@
         <activity
             android:name=".AllQuoteFragment"
             android:exported="false" />
-        <activity android:name=".RatingActivity"
-            android:exported="false"/>
         <activity android:name=".CategoryFragment"
             android:exported="false"/>
         <activity android:name=".QuoteWithCategoryFragment"
