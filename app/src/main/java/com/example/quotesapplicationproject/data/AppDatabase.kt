@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Quotes::class, Category::class, Rating::class], version = 144)
+@Database(entities = [Quotes::class, Category::class, Rating::class], version = 994)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun quotesDAO(): QuotesDAO
     abstract fun categoryDAO(): CategoryDAO

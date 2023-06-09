@@ -3,6 +3,7 @@ package com.example.quotesapplicationproject.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.quotesapplicationproject.data.entity.Category
+import com.example.quotesapplicationproject.data.entity.Quotes
 import com.example.quotesapplicationproject.data.entity.Rating
 
 @Dao
@@ -18,4 +19,9 @@ interface CategoryDAO {
     fun insert(category: Category)
     @Insert
     fun insertAll(category: List<Category>)
+    @Query("DELETE FROM category WHERE id = :categoryId")
+    fun deleteCategoryById(categoryId: Int)
+
+    @Delete
+    fun delete(category: Category)
 }

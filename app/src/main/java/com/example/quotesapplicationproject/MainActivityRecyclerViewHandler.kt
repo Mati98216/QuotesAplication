@@ -1,7 +1,7 @@
 package com.example.quotesapplicationproject
 
 import android.content.Context
-import android.content.Intent
+
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -34,11 +34,30 @@ class MainActivityRecyclerViewHandler(
     }
 
     private fun setupRecyclerView() {
-        adapter = CategoryMainAdapter(list)
+        val quotesDao = database.quotesDAO()
+        adapter = CategoryMainAdapter(list, quotesDao)
         adapter.setDialog(object : CategoryMainAdapter.Dialog {
             override fun onClick(position: Int) {
                 val category = list[position]
                 navigateToQuoteWithCategoryFragment(category.id)
+            }
+            override fun onDeleteCategory(position: Int) {
+
+                val category = list[position]
+                val categoryId = category.id
+
+                // Usuń kategorię z bazy danych na podstawie categoryId
+                CoroutineScope(Dispatchers.IO).launch {
+                    // Usunięcie kategorii z bazy danych
+                    categoryId?.let { database.categoryDAO().deleteCategoryById(it) }
+
+                    // Odświeżenie danych w widoku
+                    withContext(Dispatchers.Main) {
+                        list.removeAt(position)
+                        adapter.notifyItemRemoved(position)
+                    }
+                }
+
             }
         })
 

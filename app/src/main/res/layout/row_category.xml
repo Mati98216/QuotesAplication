@@ -19,6 +19,13 @@
         android:layout_gravity="center_vertical|center_horizontal"
         android:text="Category"
         />
-
+    <ImageButton
+        android:id="@+id/deletecategory"
+        android:layout_gravity="end"
+        android:background="@color/controls"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:src="@drawable/baseline_restore_from_trash_24"
+        android:visibility="gone"/>
 
 </LinearLayout>
