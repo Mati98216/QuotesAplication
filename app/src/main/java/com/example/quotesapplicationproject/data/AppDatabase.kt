@@ -38,7 +38,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .allowMainThreadQueries()
                     .build()
 
-                // Call the method to populate tables after the database is created
+                // Wywołuje metodę w celu wypełnienia tabel po utworzeniu bazy danych
                 GlobalScope.launch(Dispatchers.IO) {
                     populateTables(instance!!)
                 }
@@ -49,9 +49,9 @@ abstract class AppDatabase : RoomDatabase() {
             val categoryDAO = database.categoryDAO()
             val ratingDAO = database.ratingDAO()
 
-            // Check if the Rating table is already populated
+            // Sprawdza czy tabela Rating została już wypełniona
             if (ratingDAO.getCount() == 0) {
-                // Prepopulate the Rating table
+                // Wypełnia tabele
                 val ratings = listOf(
                     Rating(rating = 1.0f),
                     Rating(rating = 1.5f),
@@ -65,7 +65,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 ratingDAO.insertAll(ratings)
 
-                // Prepopulate the Category table
+                // Wypetłnia tabele
                 val categories = listOf(
                     Category(category = "Życie"),
                     Category(category = "Sport"),

@@ -34,6 +34,7 @@ class LikedQuoteFragment : Fragment() {
     private var list = mutableListOf<QuotesWithRatingAndCategory>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+       //Tworzenie widoku
         val view = inflater.inflate(R.layout.activity_likedquote, container, false)
 
         recyclerView = view.findViewById(R.id.likedquoteview)
@@ -43,13 +44,13 @@ class LikedQuoteFragment : Fragment() {
 
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
-                // Creating dialog view
+                // Tworzenie dialogowego widoku
                 val dialog = AlertDialog.Builder(requireContext())
                 dialog.setTitle(list[position].quotes.quote)
                 dialog.setItems(R.array.items_option) { dialogInterface, which ->
                     when (which) {
                         0 -> {
-                            // Edit
+                            // Edytuj
                             val editFragment = EditFragment()
                             val args = Bundle()
                             args.putInt("id", list[position].quotes.id ?:0)
@@ -57,12 +58,12 @@ class LikedQuoteFragment : Fragment() {
                             openFragment(editFragment)
                         }
                         1 -> {
-                            // Delete
+                            // Usun
                             database.quotesDAO().delete(list[position].quotes)
                             getData()
                         }
                         2 -> {
-                            // FullScreen
+                            // Pełny ekran
                             val quoteWithRatingAndCategory = list[position]
                             val quote = quoteWithRatingAndCategory.quotes
                             showFullScreenDialog(quote)
@@ -70,11 +71,11 @@ class LikedQuoteFragment : Fragment() {
                         else -> dialogInterface.dismiss()
                     }
                 }
-                // Display dialog
+                // Wyświetlanie dialogu
                 val dialogInstance = dialog.show()
                 val dialogWindow = dialogInstance.window
                 dialogWindow?.setBackgroundDrawableResource(R.color.controls)
-                /* dialog.show()*/
+
             }
         })
 
@@ -89,7 +90,11 @@ class LikedQuoteFragment : Fragment() {
         super.onResume()
         getData()
     }
-
+    /**
+     * Wyświetla dialog w pełnym ekranie z wyświetlanym cytatem i autorem.
+     * Dialog można zamknąć, dotykając obszaru poza treścią cytatu.
+     * Dotknięcie treści cytatu kopiuje cytat do schowka.
+     */
     private fun showFullScreenDialog(quote: Quotes) {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -123,7 +128,7 @@ class LikedQuoteFragment : Fragment() {
 
         dialog.show()
 
-        // Adjust dialog width and height to match the screen
+        // Dostosowanie szerokości i wysokości dialogu do rozmiaru ekranu
         dialog.window?.apply {
             attributes = attributes.apply {
                 width = WindowManager.LayoutParams.MATCH_PARENT
@@ -131,12 +136,16 @@ class LikedQuoteFragment : Fragment() {
             }
         }
     }
+    // Otwieranie nowego fragmentu
     private fun openFragment(fragment: Fragment) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fl_wrapper, fragment)
             .addToBackStack(null)
             .commit()
     }
+    /**
+     * Pobiera dane z bazy danych i aktualizuje listę polubionych cytatów.
+     */
     private fun getData() {
         list.clear()
         CoroutineScope(Dispatchers.IO).launch {

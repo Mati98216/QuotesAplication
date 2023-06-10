@@ -39,13 +39,13 @@ class AllQuoteFragment : Fragment() {
         adapter = QuoteAdapter(list,quotesDAO)
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
-                // Creating dialog view
+                // Tworzenie dialogu
                 val dialog = AlertDialog.Builder(requireContext())
                 dialog.setTitle(list[position].quotes.quote)
                 dialog.setItems(R.array.items_option) { dialogInterface, which ->
                     when (which) {
                         0 -> {
-                            // Edit
+                            // Edycja
                             val editFragment = EditFragment()
                             val args = Bundle()
                             args.putInt("id", list[position].quotes.id ?:0)
@@ -53,12 +53,12 @@ class AllQuoteFragment : Fragment() {
                             openFragment(editFragment)
                         }
                         1 -> {
-                            // Delete
+                            // Usunięcie
                             database.quotesDAO().delete(list[position].quotes)
                             getData()
                         }
                         2 -> {
-                            // FullScreen
+                            // Pełny ekran
                             val quoteWithRatingAndCategory = list[position]
                             val quote = quoteWithRatingAndCategory.quotes
                             showFullScreenDialog(quote)
@@ -66,11 +66,10 @@ class AllQuoteFragment : Fragment() {
                         else -> dialogInterface.dismiss()
                     }
                 }
-                // Display dialog
+                // Wyświetlenie dialogu
                 val dialogInstance = dialog.show()
                 val dialogWindow = dialogInstance.window
                 dialogWindow?.setBackgroundDrawableResource(R.color.controls)
-               /* dialog.show()*/
             }
         })
 
@@ -86,6 +85,7 @@ class AllQuoteFragment : Fragment() {
         return view
     }
 
+    // Wyświetlanie dialogu w trybie pełnoekranowym
     private fun showFullScreenDialog(quote: Quotes) {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -119,7 +119,7 @@ class AllQuoteFragment : Fragment() {
 
         dialog.show()
 
-        // Adjust dialog width and height to match the screen
+        // Dostosowanie szerokości i wysokości dialogu do ekranu
         dialog.window?.apply {
             attributes = attributes.apply {
                 width = WindowManager.LayoutParams.MATCH_PARENT
@@ -127,11 +127,13 @@ class AllQuoteFragment : Fragment() {
             }
         }
     }
+
     override fun onResume() {
         super.onResume()
         getData()
     }
 
+    // Pobieranie danych z bazy danych
     private fun getData() {
         list.clear()
         CoroutineScope(Dispatchers.IO).launch {
@@ -142,6 +144,7 @@ class AllQuoteFragment : Fragment() {
         }
     }
 
+    // Otwieranie nowego fragmentu
     private fun openFragment(fragment: Fragment) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fl_wrapper, fragment)

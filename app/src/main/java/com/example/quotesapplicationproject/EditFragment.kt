@@ -33,13 +33,15 @@ class EditFragment : Fragment() {
     private  var categoryList: List<Category> = emptyList()
     private  var ratingList: List<Rating> = emptyList()
 
+    // Inicjalizacja CoroutineScope przy pomocy lazy initialization
     private val coroutineScope: CoroutineScope by lazy {
         CoroutineScope(SupervisorJob() + Dispatchers.Main)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // Inicjalizacja widoku fragmentu
         val view = inflater.inflate(R.layout.activity_edit, container, false)
-
+        // Inicjalizacja pól
         quotes = view.findViewById(R.id.quote)
         author = view.findViewById(R.id.author)
         btnSave = view.findViewById(R.id.btn_save)
@@ -67,7 +69,7 @@ class EditFragment : Fragment() {
             val selectedRatingPosition = ratingList.indexOfFirst { it.id == ratingId }
             ratingSpinner.setSelection(selectedRatingPosition)
         }
-
+        // Inicjalizacja listenerów dla spinnerów
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 categoryId = categoryList[position].id ?: 0
@@ -87,25 +89,28 @@ class EditFragment : Fragment() {
                 // No action performed when nothing is selected
             }
         }
-
+        // Ustawienie listenera dla przycisku btnSave
         btnSave.setOnClickListener {
+            // Sprawdzenie czy pola tekstowe nie są puste
             if (quotes.text.isNotEmpty() && author.text.isNotEmpty()) {
                 val quoteText = quotes.text.toString()
                 val authorName = author.text.toString()
 
                 val quote = database.quotesDAO().get(quoteId)
                 if (quote != null) {
-                    // Editing an existing quote
+                    // Edycja istenijącego cytatu
                     if (isQuoteExists(quoteText, authorName, categoryId, ratingId,likedQuote)) {
                         Toast.makeText(requireContext(), "Cytat już istnieje", Toast.LENGTH_SHORT).show()
                     } else {
                         updateQuote(quote, quoteText, authorName)
                     }
                 } else {
-                    // Adding a new quote
+
                     if (isQuoteAndAuthorExist(quoteText, authorName)) {
+                        // Jeśli cytatu o podanym tekście i autorze już istnieje w bazie danych, wyświetlenie stosownego komunikatu
                         Toast.makeText(requireContext(), "Cytat i autor już istnieją", Toast.LENGTH_SHORT).show()
                     } else {
+                        // Jeśli nie istnieje, dodanie nowego cytatu do bazy danych
                         addNewQuote(quoteText, authorName)
                     }
                 }
@@ -124,6 +129,7 @@ class EditFragment : Fragment() {
 
         return view
     }
+    // Metoda odpowiedzialna za pobranie listy kategorii z bazy danych
     private fun fetchCategories() {
         database.categoryDAO().getAll().observe(viewLifecycleOwner, { categories ->
             categories?.let {
@@ -140,7 +146,7 @@ class EditFragment : Fragment() {
             }
         })
     }
-
+    // Metoda odpowiedzialna za pobranie listy ocen z bazy danych
     private fun fetchRatings() {
         database.ratingDAO().getAll().observe(viewLifecycleOwner, { ratings ->
             ratings?.let {
@@ -157,7 +163,7 @@ class EditFragment : Fragment() {
             }
         })
     }
-
+    // Metoda dodająca nowy cytat do bazy danych
     private fun addNewQuote(quoteText: String, authorName: String) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
@@ -177,7 +183,7 @@ class EditFragment : Fragment() {
             requireActivity().finish()
         }
     }
-
+    // Metoda aktualizująca istniejący cytat w bazie danych
     private fun updateQuote(quote: Quotes, quoteText: String, authorName: String) {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
@@ -192,12 +198,12 @@ class EditFragment : Fragment() {
             requireActivity().finish()
         }
     }
-
+    // Metoda sprawdzająca czy istnieje cytatu o podanym tekście i autorze w bazie danych
     private fun isQuoteAndAuthorExist(quote: String, author: String): Boolean {
         val existingQuote = database.quotesDAO().getQuoteByQuoteAndAuthor(quote, author)
         return existingQuote != null
     }
-
+    // Metoda sprawdzająca czy istnieje cytatu o podanym tekście, autorze, kategorii, ocenie i polubieniu w bazie danych
     private fun isQuoteExists(quote: String, author: String, categoryId: Int, ratingId: Int,isLikedQuote:Boolean): Boolean {
         val existingQuote = database.quotesDAO().getQuoteByDetails(quote, author, categoryId, ratingId,isLikedQuote)
         return existingQuote != null

@@ -16,11 +16,7 @@ class CategoryFragment : Fragment() {
     private lateinit var btnSaveCategory: Button
     private lateinit var database: AppDatabase
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_category, container, false)
 
         categoryName = view.findViewById(R.id.category)
@@ -38,7 +34,7 @@ class CategoryFragment : Fragment() {
                     Toast.makeText(requireContext(), "Kategoria $category już istnieje", Toast.LENGTH_SHORT).show()
                 } else {
                     val categoryList = listOf(Category(null, category))
-                    // Insert category into the database
+                    // Wstawienie kategorii do bazy danych
                     database.categoryDAO().insertAll(categoryList)
 
                     requireActivity().finish()

@@ -31,6 +31,7 @@ class QuoteWithCategoryFragment : Fragment() {
     private lateinit var database: AppDatabase
     private var categoryId: Int = -1
     private lateinit var quotesDAO: QuotesDAO
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,19 +48,19 @@ class QuoteWithCategoryFragment : Fragment() {
         categoryId = arguments?.getInt("category_id", -1) ?: -1
         database = AppDatabase.getInstance(requireContext())
         quotesDAO = database.quotesDAO()
-        adapter = QuoteAdapter(list,quotesDAO)
+        adapter = QuoteAdapter(list, quotesDAO)
         adapter.setDialog(object : QuoteAdapter.Dialog {
             override fun onClick(position: Int) {
-                // Creating dialog view
+                // Tworzenie widoku dialogowego
                 val dialog = AlertDialog.Builder(requireContext())
                 dialog.setTitle(list[position].quotes.quote)
-                dialog.setItems(R.array.items_option,
-                    DialogInterface.OnClickListener { dialog, which ->
-                        if (which == 0) {
-                            // Edit
+                dialog.setItems(R.array.items_option) { dialog, which ->
+                    when (which) {
+                        0 -> {
+                            // Edycja
                             val fragment = EditFragment()
                             val bundle = Bundle()
-                            bundle.putInt("id", list[position].quotes.id ?:0)
+                            bundle.putInt("id", list[position].quotes.id ?: 0)
                             fragment.arguments = bundle
 
                             val fragmentManager = requireActivity().supportFragmentManager
@@ -67,22 +68,25 @@ class QuoteWithCategoryFragment : Fragment() {
                                 .replace(R.id.fl_wrapper, fragment)
                                 .addToBackStack(null)
                                 .commit()
-                        } else if (which == 1) {
-                            // Delete
+                        }
+                        1 -> {
+                            // Usunięcie
                             database.quotesDAO().delete(list[position].quotes)
                             getData()
-                        } else if (which == 2) {
-                            // FullScreen
+                        }
+                        2 -> {
+                            // Pełny ekran
                             val quoteWithRatingAndCategory = list[position]
                             val quote = quoteWithRatingAndCategory.quotes
                             showFullScreenDialog(quote)
-
-                        } else {
-                            // Cancel
+                        }
+                        else -> {
+                            // Anuluj
                             dialog.dismiss()
                         }
-                    })
-                // Display dialog
+                    }
+                }
+                // Wyświetlanie dialogu
                 val dialogInstance = dialog.show()
                 val dialogWindow = dialogInstance.window
                 dialogWindow?.setBackgroundDrawableResource(R.color.controls)
@@ -91,19 +95,21 @@ class QuoteWithCategoryFragment : Fragment() {
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(requireContext() , RecyclerView.VERTICAL))
+        recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
         fab.setOnClickListener {
             val editFragment = EditFragment()
             openFragment(editFragment)
         }
-
-
     }
 
     override fun onResume() {
         super.onResume()
         getData()
     }
+
+    //Wyświetla dialog pełnoekranowy z tekstem cytatu i autorem.
+
+
     private fun showFullScreenDialog(quote: Quotes) {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -137,7 +143,7 @@ class QuoteWithCategoryFragment : Fragment() {
 
         dialog.show()
 
-        // Adjust dialog width and height to match the screen
+        // Dostosowanie szerokości i wysokości dialogu do dopasowania ekranu
         dialog.window?.apply {
             attributes = attributes.apply {
                 width = WindowManager.LayoutParams.MATCH_PARENT
@@ -147,6 +153,7 @@ class QuoteWithCategoryFragment : Fragment() {
     }
 
 
+    // Pobiera dane z bazy danych i aktualizuje listę cytatów.
 
     private fun getData() {
         list.clear()
@@ -159,11 +166,14 @@ class QuoteWithCategoryFragment : Fragment() {
             }
         }
     }
+
+
+    // Otwiera nowy fragment.
+
     private fun openFragment(fragment: Fragment) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fl_wrapper, fragment)
             .addToBackStack(null)
             .commit()
     }
-
 }

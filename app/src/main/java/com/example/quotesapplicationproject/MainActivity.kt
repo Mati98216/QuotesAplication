@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    // Otwieranie nowego fragmentu
     private fun navigateToFragment(fragment: Fragment) {
         isMainFragmentVisible = false
         recyclerView.visibility = View.GONE

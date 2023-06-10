@@ -14,7 +14,7 @@ import com.example.quotesapplicationproject.data.entity.QuotesWithRatingAndCateg
 
 class QuoteAdapter(var list: List<QuotesWithRatingAndCategory>,private val quotesDAO: QuotesDAO) : RecyclerView.Adapter<QuoteAdapter.ViewHolder>() {
     private lateinit var dialog: Dialog
-
+    //Ustawia obiekt dialogowy dla adaptera.
     fun setDialog(dialog: Dialog) {
         this.dialog = dialog
     }
@@ -22,7 +22,7 @@ class QuoteAdapter(var list: List<QuotesWithRatingAndCategory>,private val quote
     interface Dialog {
         fun onClick(position: Int)
     }
-
+    //Tworzy nowy ViewHolder na podstawie określonego layoutu.
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var quotes: TextView
         var author: TextView
@@ -51,17 +51,17 @@ class QuoteAdapter(var list: List<QuotesWithRatingAndCategory>,private val quote
             }
         }
     }
-
+    //Tworzy nowy obiekt ViewHolder, który jest odpowiedzialny za zarządzanie widokiem reprezentującym pojedynczy element listy.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.row_quote, parent, false)
         return ViewHolder(view)
     }
-
+    // Zwraca liczbę elementów w liście
     override fun getItemCount(): Int {
         return list.size
     }
-
+    //Przypisuje dane do konkretnego ViewHoldera na podstawie jego pozycji.
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val quote = list[position].quotes
         holder.quotes.text = "Quote: ${quote.quote}"
@@ -77,10 +77,9 @@ class QuoteAdapter(var list: List<QuotesWithRatingAndCategory>,private val quote
         }
         holder.likedQuoteButton.setImageResource(likedQuoteImage)
     }
-
+    //Aktualizuje pole LikedQuote w bazie danych
     private fun updateLikedQuote(quote: Quotes) {
-        // Call the DAO method to update the likedQuote column
-        // You need to have access to the QuotesDAO instance to call this method
+
         quotesDAO.update(quote)
         val position = list.indexOfFirst { it.quotes.id == quote.id }
         if (position != -1) {
